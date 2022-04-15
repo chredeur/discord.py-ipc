@@ -118,7 +118,7 @@ class Server:
         """
         Hooks into add_cog and allows for easy route finding within classes
         """
-        self._add_cog(cog, override=override)
+        await self._add_cog(cog, override=override)
 
         method_list = [
             getattr(cog, func)
