@@ -3,6 +3,7 @@ import logging
 import aiohttp.web
 from discord.ext.commands import Cog
 from discord.utils import MISSING
+from typing import Optional
 
 from .errors import *
 
