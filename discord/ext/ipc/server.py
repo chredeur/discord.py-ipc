@@ -106,7 +106,15 @@ class Server:
         for routes in self.sorted_endpoints.values():
             self.endpoints = {**self.endpoints, **routes}
 
-    def add_cog(self, cog: Cog, *, override: bool = False) -> None:
+    async def add_cog(
+        self,
+        cog: Cog,
+        /,
+        *,
+        override: bool = False,
+        guild: Optional[Snowflake] = MISSING,
+        guilds: List[Snowflake] = MISSING,
+    ) -> None:
         """
         Hooks into add_cog and allows for easy route finding within classes
         """
