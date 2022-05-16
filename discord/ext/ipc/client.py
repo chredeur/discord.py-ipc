@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 import aiohttp
+from contextlib import suppress
 from .errors import *
 
 log = logging.getLogger(__name__)
@@ -26,6 +27,8 @@ class Client:
     ):
         """Constructor"""
         self.loop = asyncio.get_event_loop()
+        
+        self.lock = asyncio.Lock()
 
         self.secret_key = secret_key
 
@@ -98,7 +101,7 @@ class Client:
             The data to send to the endpoint
         """
         log.info("Requesting IPC Server for %r with %r", endpoint, kwargs)
-        if not self.session:
+        if not self.session or not self.websocket:
             await self.init_sock()
 
         payload = {
@@ -107,12 +110,14 @@ class Client:
             "headers": {"Authorization": self.secret_key},
         }
 
-        await self.websocket.send_json(payload)
+        with suppress(RuntimeError):  # for uvloop
+            await self.websocket.send_json(payload)
 
         log.debug("Client > %r", payload)
 
-        recv = await self.websocket.receive()
-
+        async with self.lock:
+            recv = await self.websocket.receive()
+            
         log.debug("Client < %r", recv)
 
         if recv.type == aiohttp.WSMsgType.PING:
