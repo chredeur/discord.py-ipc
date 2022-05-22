@@ -2,7 +2,6 @@ import asyncio
 import logging
 
 import aiohttp
-from contextlib import suppress
 from .errors import *
 
 log = logging.getLogger(__name__)
@@ -27,8 +26,6 @@ class Client:
     ):
         """Constructor"""
         self.loop = asyncio.get_event_loop()
-        
-        self.lock = asyncio.Lock()
 
         self.secret_key = secret_key
 
@@ -110,13 +107,11 @@ class Client:
             "headers": {"Authorization": self.secret_key},
         }
 
-        with suppress(RuntimeError):  # for uvloop
-            await self.websocket.send_json(payload)
+        await self.websocket.send_json(payload)
 
         log.debug("Client > %r", payload)
 
-        async with self.lock:
-            recv = await self.websocket.receive()
+        recv = await self.websocket.receive()
             
         log.debug("Client < %r", recv)
 
