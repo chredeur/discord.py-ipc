@@ -98,7 +98,7 @@ class Client:
             The data to send to the endpoint
         """
         log.info("Requesting IPC Server for %r with %r", endpoint, kwargs)
-        if not self.session or not self.websocket:
+        if not self.session:
             await self.init_sock()
 
         payload = {
