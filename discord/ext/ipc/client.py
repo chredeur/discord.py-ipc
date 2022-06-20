@@ -144,5 +144,4 @@ class Client:
 
             return await self.request(endpoint, **kwargs)
         
-        await self.session.close()
         return recv.json()
