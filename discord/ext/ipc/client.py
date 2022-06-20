@@ -143,5 +143,6 @@ class Client:
             await self.init_sock()
 
             return await self.request(endpoint, **kwargs)
-
+        
+        await self.session.close()
         return recv.json()
