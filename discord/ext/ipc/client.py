@@ -3,6 +3,7 @@ import logging
 
 import aiohttp
 from .errors import *
+from contextlib import suppress
 
 log = logging.getLogger(__name__)
 
@@ -107,11 +108,13 @@ class Client:
             "headers": {"Authorization": self.secret_key},
         }
 
-        await self.websocket.send_json(payload)
+        with suppress(RuntimeError):  # for uvloop
+            await self.websocket.send_json(payload)
 
         log.debug("Client > %r", payload)
 
-        recv = await self.websocket.receive()
+        async with self.lock:
+            recv = await self.websocket.receive()
             
         log.debug("Client < %r", recv)
 
